@@ -146,8 +146,9 @@ class SimpleUpdatePanel:
         ttk.Label(top, textvariable=self.status_var).pack(side=tk.LEFT, padx=16)
         # Concurrency selector
         ttk.Label(top, text="Max updates (parallel):").pack(side=tk.LEFT, padx=(24,4))
-        self.max_concurrency_var = tk.IntVar(value=2)
-        ttk.Combobox(top, values=[1,2,3,4], width=3, state="readonly", textvariable=self.max_concurrency_var).pack(side=tk.LEFT)
+        # Force single parallel update
+        self.max_concurrency_var = tk.IntVar(value=1)
+        ttk.Combobox(top, values=[1], width=3, state="readonly", textvariable=self.max_concurrency_var).pack(side=tk.LEFT)
 
         files = ttk.LabelFrame(self.frame, text="Update Files", style="Card.TLabelframe")
         files.pack(fill=tk.X, padx=16, pady=8)
@@ -190,6 +191,7 @@ class SimpleUpdatePanel:
         dev = ttk.LabelFrame(self.frame, text="Last Device", style="Card.TLabelframe")
         dev.pack(fill=tk.X, padx=16, pady=8)
         self.dev_ip = ttk.Label(dev, text="IP: -"); self.dev_ip.pack(anchor="w", padx=6, pady=2)
+        self.dev_mac = ttk.Label(dev, text="MAC: -"); self.dev_mac.pack(anchor="w", padx=6, pady=2)
         self.dev_bl = ttk.Label(dev, text="Bootloader: -"); self.dev_bl.pack(anchor="w", padx=6, pady=2)
         self.dev_app = ttk.Label(dev, text="App: -"); self.dev_app.pack(anchor="w", padx=6, pady=2)
         self.dev_en = ttk.Label(dev, text="Enactor: -"); self.dev_en.pack(anchor="w", padx=6, pady=2)
@@ -366,6 +368,10 @@ class SimpleUpdatePanel:
                         self._maybe_enqueue(ip, parsed)
             # last device panel (informational)
             self.dev_ip.config(text=f"IP: {ip}")
+            try:
+                self.dev_mac.config(text=f"MAC: {mac}")
+            except Exception:
+                pass
             if parsed:
                 self.dev_bl.config(text=f"Bootloader: {bl[0]}.{bl[1]}")
                 ac = parsed.get('app_crc'); ec = parsed.get('enactor_crc')
